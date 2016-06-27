@@ -2,22 +2,10 @@ import ipywidgets as widgets
 from traitlets import (
     CBool,
     CFloat,
+    Dict,
     Tuple,
     Unicode,
 )
-
-"""
-derivedAttributes: {}
-aggregators: locales[locale].aggregators
-renderers: locales[locale].renderers
-hiddenAttributes: []
-menuLimit: 200
-cols: [], rows: [], vals: []
-exclusions: {}
-inclusions: {}
-unusedAttrsVertical: 85
-autoSortUnusedAttrs: false
-"""
 
 
 @widgets.register("widgetpivottable.PivotTable")
@@ -36,3 +24,5 @@ class PivotTable(widgets.DOMWidget):
     sort_unused = CBool(False).tag(sync=True)
     aggregator = Unicode().tag(sync=True)
     renderer = Unicode().tag(sync=True)
+    exclusions = Dict().tag(sync=True)
+    inclusions = Dict().tag(sync=True)

@@ -30,7 +30,9 @@ var PivotTableModel = widgets.DOMWidgetModel.extend({
     renderer: null,
     menu_limit: 200,
     sort_unused: false,
-    hidden: []
+    hidden: [],
+    inclusions: {},
+    exclusions: {}
   })
 });
 
@@ -42,7 +44,7 @@ var PivotTableView = widgets.DOMWidgetView.extend({
     var that = this;
     this.$wrapper = $("<div/>", {"class": "widget-pivottable-wrapper"})
       .appendTo(this.el);
-    this.listenTo(this.model, 'change', this.value_changed);
+    this.listenTo(this.model, 'change', this.traitlets_changed);
     this.displayed.then(function(){
       that.traitlets_changed();
     });
@@ -53,15 +55,15 @@ var PivotTableView = widgets.DOMWidgetView.extend({
   },
 
   on_refresh: function(opts){
-    var new_vals = {
+    var new_opts = {
       cols: opts.cols,
       rows: opts.rows,
+      vals: opts.vals,
       aggregator: opts.aggregatorName,
-      renderer: opts.rendererName,
-      hidden: opts.hiddenAttributes
+      renderer: opts.rendererName
     };
 
-    this.model.set(new_vals);
+    this.model.set(new_opts);
 
     this.touch();
   },
@@ -76,24 +78,48 @@ var PivotTableView = widgets.DOMWidgetView.extend({
       "max-width": wrapper_width
     });
 
-    this.$wrapper.pivotUI(this.model.get("records"),
-      {
-        rows: this.model.get("rows"),
-        cols: this.model.get("cols"),
-        vals: this.model.get("vals"),
-        // hiddenAttributes: this.model.get("hidden"),
-        aggregatorName: this.model.get("aggregator") || null,
-        rendererName: this.model.get("renderer") || null,
-        autoSortUnusedAttrs: this.model.get("sort_unused"),
-        menuLimit: this.model.get("menu_limit"),
-        renderers: $.extend(
-          $.pivotUtilities.renderers,
-          $.pivotUtilities.c3_renderers,
-          $.pivotUtilities.d3_renderers,
-          $.pivotUtilities.export_renderers
-        ),
-        onRefresh: _.bind(this.on_refresh, this)
-      })
+    var old_opts = this.$wrapper.data("pivotUIOptions");
+
+    var opts = {
+      rows: this.model.get("rows"),
+      cols: this.model.get("cols"),
+      vals: this.model.get("vals"),
+      hiddenAttributes: this.model.get("hidden"),
+      aggregatorName: this.model.get("aggregator") || null,
+      rendererName: this.model.get("renderer") || null,
+      autoSortUnusedAttrs: this.model.get("sort_unused"),
+      menuLimit: this.model.get("menu_limit"),
+      inclusions: this.model.get("inclusions"),
+      exclusions: this.model.get("exclusions")
+    };
+
+    // avoid uneccessary redraw (i.e. user-created)
+    if(old_opts && !_.isMatch(old_opts, opts)){
+      return;
+    }
+
+    // add these
+    _.extend(opts, {
+      renderers: $.extend(
+        {},
+        $.pivotUtilities.renderers,
+        $.pivotUtilities.c3_renderers,
+        $.pivotUtilities.d3_renderers,
+        $.pivotUtilities.export_renderers
+      ),
+      onRefresh: function(opts){
+        _.delay(function(){
+          that.on_refresh(opts);
+        }, 100);
+      }
+    });
+
+    this.$wrapper
+      .pivotUI(
+        this.model.get("records"),
+        opts,
+        true // overwrite!
+      )
       .show();
   }
 });
