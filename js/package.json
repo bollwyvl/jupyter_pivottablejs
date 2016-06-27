@@ -1,0 +1,35 @@
+{
+  "name": "jupyter-widget-pivottable",
+  "version": "0.0.1",
+  "description": "A Jupyter Pivot Table Widget",
+  "author": "Nicolas Kruchten",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicolaskruchten/jupyter-widget-pivottable.git"
+  },
+  "keywords": [
+    "jupyter",
+    "widgets",
+    "ipython",
+    "ipywidgets"
+  ],
+  "scripts": {
+    "prepublish": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "css-loader": "^0.23.1",
+    "jquery": "^2.1.4",
+    "json-loader": "^0.5.4",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.12.14"
+  },
+  "dependencies": {
+    "c3": "^0.4.11",
+    "d3": "^3.5.17",
+    "jupyter-js-widgets": "^1.1.1",
+    "pivottable": "^2.0.2",
+    "underscore": "^1.8.3"
+  }
+}

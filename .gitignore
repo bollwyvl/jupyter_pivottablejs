@@ -1,0 +1,13 @@
+*.egg-info/
+.ipynb_checkpoints/
+dist/
+build/
+*.py[cod]
+node_modules/
+
+# Compiled javascript
+widgetpivottable/static/
+
+# OS X
+.DS_Store
+npm-debug.log
